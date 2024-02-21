@@ -3,4 +3,5 @@ export const SOCKET_EVENTS = {
   ALL_USERNAMES: "all-usernames",
   PLAYER_LEFT: "player-left",
   PLAYING: "playing",
+  REACT: "react",
 };

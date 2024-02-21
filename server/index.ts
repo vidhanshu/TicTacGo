@@ -102,6 +102,13 @@ io.on("connection", (socket) => {
     }
   );
 
+  socket.on(
+    SOCKET_EVENTS.REACT,
+    ({ emote, to }: { emote: string; to: string }) => {
+      io.to(to).emit(SOCKET_EVENTS.REACT, emote);
+    }
+  );
+
   socket.on("disconnect", () => {
     const existsAleady = queue.find((user) => user.socketId === socket.id);
     if (existsAleady) {
