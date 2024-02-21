@@ -18,6 +18,7 @@ export const useRealtimeTicTacToe = ({
     won: null | "X" | "O";
     draw: boolean;
   } | null>(null);
+  const [reacting, setReacting] = useState<string>("");
   const [board, setBoard] = useState<string[]>(Array(9).fill(null));
   const [gameState, setGameState] = useState<GameState>(null);
   const [allPlayersUsername, setAllPlayersUsername] = useState<string[]>([]);
@@ -59,15 +60,23 @@ export const useRealtimeTicTacToe = ({
         };
       });
     };
+    const handleReactEvent = (payload: string) => {
+      setReacting(payload);
+      setTimeout(() => {
+        setReacting("");
+      }, 5000);
+    };
 
     socket.on(SOCKET_EVENTS.ALL_USERNAMES, handleAllUsernameEvent);
     socket.on(SOCKET_EVENTS.FIND_MATCH, handleFoundMatchEvent);
     socket.on(SOCKET_EVENTS.PLAYING, handlePlayingEvent);
+    socket.on(SOCKET_EVENTS.REACT, handleReactEvent);
 
     () => {
       socket.off(SOCKET_EVENTS.FIND_MATCH, handleFoundMatchEvent);
       socket.off(SOCKET_EVENTS.ALL_USERNAMES, handleAllUsernameEvent);
       socket.off(SOCKET_EVENTS.PLAYING, handlePlayingEvent);
+      socket.off(SOCKET_EVENTS.REACT, handleReactEvent);
     };
   }, [socket, isConnected]);
 
@@ -146,6 +155,17 @@ export const useRealtimeTicTacToe = ({
   const handleDrawCheck = (boardState: string[]) =>
     boardState.every((item) => item !== null);
 
+  const handleReact = (payload: string) => {
+    if (!socket || !gameState) return;
+    socket.emit(SOCKET_EVENTS.REACT, {
+      emote: payload,
+      to:
+        gameState.p1.username === username
+          ? gameState.p2.socketId
+          : gameState.p1.socketId,
+    });
+  };
+
   return {
     findMatch,
     handlePlay,
@@ -154,6 +174,8 @@ export const useRealtimeTicTacToe = ({
     allPlayersUsername,
     isConnected,
     wonDrawState,
+    reacting,
+    handleReact,
   };
 };
 

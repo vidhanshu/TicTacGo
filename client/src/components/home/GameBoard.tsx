@@ -8,15 +8,19 @@ import ReactConfetti from "react-confetti";
 import { useAudioContext } from "@/context/audio-context";
 
 export const GameBoard = ({
+  reacting,
   gameState,
   currentUsername,
   handlePlay,
+  handleReact,
   board,
   wonDrawState,
 }: {
+  reacting: string;
   gameState: NonNullable<GameState>;
   currentUsername: string;
   handlePlay: (index: number) => void;
+  handleReact: (reaction: string) => void;
   board: string[];
   wonDrawState: { won: null | "X" | "O"; draw: boolean } | null;
 }) => {
@@ -38,21 +42,31 @@ export const GameBoard = ({
           <Logo straight />
         </div>
         <div className="flex justify-between items-center max-w-screen-lg mx-auto pb-6 px-4">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center gap-2">
             <h4 className="text-xl font-bold">
               You: <span className="text-blue-500">{me?.username}</span>
             </h4>
+            <div className="border rounded-md p-2 text-xl">
+              {["😂", "🥲", "😶", "😎", "🤔"].map((emote) => (
+                <button key={emote} onClick={() => handleReact(emote)}>
+                  {emote}
+                </button>
+              ))}
+            </div>
             <BsJoystick
               size={30}
               className={cn(
                 isMyTurn && !(wonDrawState?.won || wonDrawState?.draw)
                   ? ""
                   : "invisible",
-                "mt-1 fill-emerald-500"
+                "fill-emerald-500"
               )}
             />
           </div>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center relative">
+            {reacting && (
+              <div className="text-4xl absolute -top-10 rounded-full animate-bounce">{reacting}</div>
+            )}
             <h4 className="text-xl font-bold">
               Opponent:{" "}
               <span className="text-blue-500">{opponent?.username}</span>
