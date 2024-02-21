@@ -20,7 +20,7 @@ export const SocketContextProvider = ({ children }: PropsWithChildren) => {
   const [isConnected, setIsConnected] = useState<Boolean>(false);
 
   useEffect(() => {
-    setSocketInstance(io("http://localhost:8000"));
+    setSocketInstance(io("https://tic-tac-go-backend.onrender.com"));
   }, []);
 
   useEffect(() => {
