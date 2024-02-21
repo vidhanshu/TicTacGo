@@ -5,6 +5,7 @@ import { MdClose } from "react-icons/md";
 import { GoCircle } from "react-icons/go";
 import Logo from "../Logo";
 import ReactConfetti from "react-confetti";
+import { useAudioContext } from "@/context/audio-context";
 
 export const GameBoard = ({
   gameState,
@@ -19,6 +20,7 @@ export const GameBoard = ({
   board: string[];
   wonDrawState: { won: null | "X" | "O"; draw: boolean } | null;
 }) => {
+  const { playTap } = useAudioContext();
   const me =
     gameState?.p1.username === currentUsername ? gameState.p1 : gameState?.p2;
   const opponent =
@@ -98,7 +100,14 @@ export const GameBoard = ({
           {board.map((item, index) => (
             <button
               key={index}
-              onClick={isMyTurn ? handlePlay.bind(null, index) : undefined}
+              onClick={
+                isMyTurn
+                  ? () => {
+                      handlePlay(index);
+                      playTap();
+                    }
+                  : undefined
+              }
               disabled={!!item || !!wonDrawState?.won || wonDrawState?.draw}
               className={cn(
                 !isMyTurn && !item && "cursor-default",

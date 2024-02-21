@@ -3,6 +3,7 @@ import { useSocketContext } from "../context/socket-context";
 import { GameState, PlayingPayload } from "../types";
 import { SOCKET_EVENTS } from "../utils";
 import { useModal } from "./use-modal-store";
+import { useAudioContext } from "@/context/audio-context";
 
 export const useRealtimeTicTacToe = ({
   username,
@@ -11,6 +12,7 @@ export const useRealtimeTicTacToe = ({
   username: string;
   setFinding: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const { playEnter, playLose, playWin } = useAudioContext();
   const { onOpen } = useModal();
   const [wonDrawState, setWonDrawState] = useState<{
     won: null | "X" | "O";
@@ -29,6 +31,7 @@ export const useRealtimeTicTacToe = ({
     };
     const handleFoundMatchEvent = (playersObj: GameState) => {
       setGameState(playersObj);
+      playEnter();
       setFinding(false);
     };
     const handlePlayingEvent = (payload: Omit<PlayingPayload, "to">) => {
@@ -39,6 +42,7 @@ export const useRealtimeTicTacToe = ({
         );
         if (handleWinCheck(newGameState)) {
           onOpen("You Lost");
+          playLose();
           setWonDrawState({ won: currentTurn, draw: false });
         } else if (handleDrawCheck(newGameState)) {
           setWonDrawState({ won: null, draw: true });
@@ -101,7 +105,8 @@ export const useRealtimeTicTacToe = ({
       );
 
       if (handleWinCheck(newGameState)) {
-        onOpen("You Won")
+        onOpen("You Won");
+        playWin();
         setWonDrawState({ won: gameState.turn, draw: false });
       } else if (handleDrawCheck(newGameState)) {
         setWonDrawState({ won: null, draw: true });

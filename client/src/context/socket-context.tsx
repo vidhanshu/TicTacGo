@@ -1,3 +1,4 @@
+import { SERVER_URL } from "@/utils";
 import {
   PropsWithChildren,
   createContext,
@@ -20,7 +21,7 @@ export const SocketContextProvider = ({ children }: PropsWithChildren) => {
   const [isConnected, setIsConnected] = useState<Boolean>(false);
 
   useEffect(() => {
-    setSocketInstance(io("https://tic-tac-go-backend.onrender.com"));
+    setSocketInstance(io(SERVER_URL));
   }, []);
 
   useEffect(() => {
