@@ -24,7 +24,7 @@ const Home = () => {
   return (
     <main className="dark min-h-screen w-full flex flex-col items-center justify-center">
       <div className="fixed top-0 right-0 m-4 p-2 rounded-md text-white text-sm font-bold">
-        {isConnected ? "🟢 Connected" : "🔴 Disconnected"}
+        {isConnected ? "🟢 Connected" : <span className="animate-pulse">🟡 Connecting...</span>}
       </div>
       {gameState ? (
         <GameBoard
