@@ -12,12 +12,17 @@ export const useRealtimeTicTacToe = ({
   username: string;
   setFinding: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { playEnter, playLose, playWin } = useAudioContext();
   const { onOpen } = useModal();
-  const [wonDrawState, setWonDrawState] = useState<{
+  const { playEnter, playLose, playWin } = useAudioContext();
+  const [wonDrawLeftState, setWonDrawLeftState] = useState<{
     won: null | "X" | "O";
-    draw: boolean;
-  } | null>(null);
+    draw: null | boolean;
+    left: null | boolean;
+  }>({
+    won: null,
+    draw: null,
+    left: null,
+  });
   const [reacting, setReacting] = useState<string>("");
   const [board, setBoard] = useState<string[]>(Array(9).fill(null));
   const [gameState, setGameState] = useState<GameState>(null);
@@ -44,21 +49,23 @@ export const useRealtimeTicTacToe = ({
         if (handleWinCheck(newGameState)) {
           onOpen("You Lost");
           playLose();
-          setWonDrawState({ won: currentTurn, draw: false });
+          setWonDrawLeftState((prev) => ({
+            ...prev,
+            won: currentTurn,
+            draw: false,
+          }));
         } else if (handleDrawCheck(newGameState)) {
-          setWonDrawState({ won: null, draw: true });
+          setWonDrawLeftState((prev) => ({ ...prev, won: null, draw: true }));
           onOpen("Draw");
         }
 
         return newGameState;
       });
-      setGameState((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          turn: prev.turn === "X" ? "O" : "X",
-        };
-      });
+      setGameState(
+        gameState
+          ? { ...gameState, turn: gameState.turn === "X" ? "O" : "X" }
+          : null
+      );
     };
     const handleReactEvent = (payload: string) => {
       setReacting(payload);
@@ -66,19 +73,47 @@ export const useRealtimeTicTacToe = ({
         setReacting("");
       }, 5000);
     };
+    const handlePlayerLeft = (username: string) => {
+      onOpen("User Left", { username });
+      setWonDrawLeftState((prev) => ({ ...prev, left: true }));
+    };
+    const handlePlayAgainRequestEvent = () => {
+      if (!gameState) return;
+      const opponent =
+        gameState.p1.username === username ? gameState.p2 : gameState.p1;
+      onOpen("Play Again?", {
+        username: opponent?.username,
+        handlePlayAgain: () => {
+          resetGame();
+          // tell the other player that you want to play again
+          socket.emit(SOCKET_EVENTS.OK_PLAY_AGAIN, {
+            to: opponent.socketId,
+          });
+        },
+      });
+    };
+    const handleOkayPlayAgainEvent = () => {
+      resetGame();
+    };
 
     socket.on(SOCKET_EVENTS.ALL_USERNAMES, handleAllUsernameEvent);
     socket.on(SOCKET_EVENTS.FIND_MATCH, handleFoundMatchEvent);
     socket.on(SOCKET_EVENTS.PLAYING, handlePlayingEvent);
     socket.on(SOCKET_EVENTS.REACT, handleReactEvent);
+    socket.on(SOCKET_EVENTS.PLAYER_LEFT, handlePlayerLeft);
+    socket.on(SOCKET_EVENTS.PLAY_AGAIN, handlePlayAgainRequestEvent);
+    socket.on(SOCKET_EVENTS.OK_PLAY_AGAIN, handleOkayPlayAgainEvent);
 
     () => {
       socket.off(SOCKET_EVENTS.FIND_MATCH, handleFoundMatchEvent);
       socket.off(SOCKET_EVENTS.ALL_USERNAMES, handleAllUsernameEvent);
       socket.off(SOCKET_EVENTS.PLAYING, handlePlayingEvent);
       socket.off(SOCKET_EVENTS.REACT, handleReactEvent);
+      socket.off(SOCKET_EVENTS.PLAYER_LEFT, handlePlayerLeft);
+      socket.off(SOCKET_EVENTS.PLAY_AGAIN, handlePlayAgainRequestEvent);
+      socket.off(SOCKET_EVENTS.OK_PLAY_AGAIN, handleOkayPlayAgainEvent);
     };
-  }, [socket, isConnected]);
+  }, [socket, isConnected, gameState]);
 
   const findMatch = () => {
     if (!socket) return;
@@ -116,9 +151,13 @@ export const useRealtimeTicTacToe = ({
       if (handleWinCheck(newGameState)) {
         onOpen("You Won");
         playWin();
-        setWonDrawState({ won: gameState.turn, draw: false });
+        setWonDrawLeftState((prev) => ({
+          ...prev,
+          won: gameState.turn,
+          draw: false,
+        }));
       } else if (handleDrawCheck(newGameState)) {
-        setWonDrawState({ won: null, draw: true });
+        setWonDrawLeftState((prev) => ({ ...prev, won: null, draw: true }));
         onOpen("Draw");
       }
 
@@ -166,6 +205,31 @@ export const useRealtimeTicTacToe = ({
     });
   };
 
+  const askToPlayAgain = () => {
+    if (!socket || !gameState) return;
+    const opponent =
+      gameState.p1.username === username ? gameState.p2 : gameState.p1;
+    socket.emit(SOCKET_EVENTS.PLAY_AGAIN, {
+      to: opponent.socketId,
+    });
+  };
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setGameState((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        turn: "X",
+      };
+    });
+    setWonDrawLeftState({
+      won: null,
+      draw: null,
+      left: null,
+    });
+  };
+
   return {
     findMatch,
     handlePlay,
@@ -173,9 +237,10 @@ export const useRealtimeTicTacToe = ({
     gameState,
     allPlayersUsername,
     isConnected,
-    wonDrawState,
+    wonDrawLeftState,
     reacting,
     handleReact,
+    askToPlayAgain,
   };
 };
 

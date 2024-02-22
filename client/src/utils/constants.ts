@@ -4,6 +4,8 @@ export const SOCKET_EVENTS = {
   PLAYER_LEFT: "player-left",
   PLAYING: "playing",
   REACT: "react",
+  PLAY_AGAIN: "play-again",
+  OK_PLAY_AGAIN: "ok-play-again",
 };
 
 export const SERVER_URL =

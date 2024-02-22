@@ -11,10 +11,11 @@ const Home = () => {
     board,
     gameState,
     isConnected,
-    wonDrawState,
+    wonDrawLeftState,
     allPlayersUsername,
     reacting,
-    handleReact
+    askToPlayAgain,
+    handleReact,
   } = useRealtimeTicTacToe({
     username,
     setFinding,
@@ -28,13 +29,14 @@ const Home = () => {
       </div>
       {gameState ? (
         <GameBoard
+          askToPlayAgain={askToPlayAgain}
           reacting={reacting}
           board={board}
           handlePlay={handlePlay}
           handleReact={handleReact}
           currentUsername={username}
           gameState={gameState}
-          wonDrawState={wonDrawState}
+          wonDrawLeftState={wonDrawLeftState}
         />
       ) : (
         <DetailsForm

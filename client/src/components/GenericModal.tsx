@@ -10,19 +10,34 @@ import { Button } from ".";
 const GenericModal = ({
   isModalOpen,
   onClose,
+  handleOk,
   title,
+  showCancel,
 }: {
   isModalOpen: boolean;
   onClose: () => void;
+  handleOk?: () => void;
   title: React.ReactNode;
+  showCancel?: boolean;
 }) => {
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
+    <Dialog open={isModalOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogFooter>
-            <Button onClick={onClose} className="mt-8">
+            {showCancel && (
+              <Button color="danger" onClick={onClose} className="mt-8">
+                Cancel
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                onClose();
+                handleOk?.();
+              }}
+              className="mt-8"
+            >
               Okay!
             </Button>
           </DialogFooter>

@@ -1,2 +1,2 @@
 export * from "./DetailsForm"
-export * from "./GameBoard"
+export * from "./game-board/GameBoard"

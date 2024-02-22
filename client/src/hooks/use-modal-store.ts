@@ -1,8 +1,11 @@
 import { create } from "zustand";
 
-export type ModalType = "You Won" | "You Lost" | "Draw" | "Username Wrong";
+export type ModalType = "You Won" | "You Lost" | "Draw" | "Username Wrong" | "User Left" | "Play Again?";
 
-interface ModalData {}
+interface ModalData {
+  username?: string;
+  handlePlayAgain?: () => void;
+}
 
 interface ModalStore {
   type: ModalType | null;
