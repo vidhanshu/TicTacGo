@@ -49,9 +49,9 @@ const GameBoardHeader = ({
   };
   return (
     <>
-      <div className="flex justify-between max-w-screen-lg mx-auto pb-6 px-4">
+      <div className="flex justify-between max-w-screen-lg mx-auto pb-6 px-4 gap-x-2">
         {/* me */}
-        <div className="w-[180px] relative space-y-2 border border-slate-600 rounded-lg py-4 px-8">
+        <div className="w-[160px] md:w-[180px] relative space-y-2 border border-slate-600 rounded-lg p-4 md:py-4 md:px-8">
           <div className="relative mx-auto w-fit">
             <Avatar className="bg-slate-700 w-[60px] h-[60px]">
               <AvatarImage
@@ -79,15 +79,14 @@ const GameBoardHeader = ({
               <GoCircle size={30} className="text-blue-500 mx-auto" />
             )}
           </h1>
-          <div className="flex gap-x-4">
+          <div className="flex gap-x-4 justify-center">
             {!wonDrawLeftState?.left ? (
               <>
                 <HoverCard closeDelay={0} openDelay={0}>
                   <HoverCardTrigger asChild>
                     <button className="p-2 border-[2px] border-slate-700 rounded-full hover:bg-slate-700 group">
                       <BsEmojiSmile
-                        className="fill-slate-600 group-hover:fill-white"
-                        size={24}
+                        className="fill-slate-600 group-hover:fill-white w-4 h-4 md:w-6 md:h-6"
                       />
                     </button>
                   </HoverCardTrigger>
@@ -103,8 +102,7 @@ const GameBoardHeader = ({
                   <HoverCardTrigger asChild>
                     <button className="p-2 border-[2px] border-slate-700 rounded-full hover:bg-slate-700 group">
                       <BsChat
-                        className="fill-slate-600 group-hover:fill-white"
-                        size={24}
+                        className="fill-slate-600 group-hover:fill-white w-4 h-4 md:w-6 md:h-6"
                       />
                     </button>
                   </HoverCardTrigger>
@@ -145,7 +143,7 @@ const GameBoardHeader = ({
             ) : null}
           </div>
           {meReacting && (
-            <div className="p-1 bg-black absolute border border-slate-400 px-2 rounded-lg w-[180px] md:w-[200px] h-[60px] -top-[65px] inset-x-0 md:inset-auto md:top-0 md:-right-full">
+            <div className="p-1 bg-black absolute border border-slate-400 px-2 rounded-lg w-[160px] md:w-[200px] h-[60px] -bottom-[65px] inset-x-0 md:inset-auto md:top-0 md:-right-full">
               <div
                 className={cn(
                   EMOTES.includes(meReacting)
@@ -164,7 +162,7 @@ const GameBoardHeader = ({
         </div>
 
         {/* opponent */}
-        <div className="w-[180px] relative space-y-2 border border-slate-600 rounded-lg py-4 px-8">
+        <div className="w-[160px] md:w-[180px] relative space-y-2 border border-slate-600 rounded-lg p-4 md:py-4 md:px-8">
           <div className="relative mx-auto w-fit">
             <Avatar className="bg-slate-700 w-[60px] h-[60px]">
               <AvatarImage
@@ -193,7 +191,7 @@ const GameBoardHeader = ({
             )}
           </h1>
           {reacting && (
-            <div className="bg-black absolute border border-slate-400 px-2 rounded-lg w-[180px] md:w-[200px] h-[60px] -top-[65px] inset-x-0 md:inset-auto md:top-0 md:-left-full ">
+            <div className="bg-black absolute border border-slate-400 px-2 rounded-lg w-[160px] md:w-[200px] h-[60px] -bottom-[65px] inset-x-0 md:inset-auto md:top-0 md:-left-full ">
               <div
                 className={cn(
                   EMOTES.includes(reacting)
