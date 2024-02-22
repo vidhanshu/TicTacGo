@@ -5,7 +5,6 @@ import App from "./App.tsx";
 import "./index.css";
 
 import { SocketContextProvider } from "./context/socket-context.tsx";
-import SplashScreen from "./components/home/SplashScreen.tsx";
 import AudioContextProvider from "./context/audio-context.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -14,7 +13,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <AudioContextProvider>
         <BrowserRouter>
           <App />
-          <SplashScreen />
         </BrowserRouter>
       </AudioContextProvider>
     </SocketContextProvider>

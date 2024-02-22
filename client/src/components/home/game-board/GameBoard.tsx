@@ -74,7 +74,7 @@ export const GameBoard = ({
               }
               className={cn(
                 !isMyTurn && !item && "cursor-default",
-                "w-[100px] h-[100px] border border-slate-700 text-xl rounded-lg hover:bg-slate-900 flex items-center justify-center",
+                "w-[100px] h-[100px] border border-slate-600 text-xl rounded-lg hover:bg-slate-900 flex items-center justify-center",
                 item === "X"
                   ? "border-red-500"
                   : item === "O"

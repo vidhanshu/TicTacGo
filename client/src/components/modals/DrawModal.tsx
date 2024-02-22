@@ -1,5 +1,5 @@
 import { useModal } from "@/hooks/use-modal-store";
-import GenericModal from "./GenericModal";
+import GenericModal from "../GenericModal";
 
 const DrawModal = () => {
   const { isOpen, onClose, type } = useModal();

@@ -2,7 +2,7 @@ import { PropsWithChildren, createContext, useContext, useRef } from "react";
 import entered from "@/assets/entered.mp3";
 import lose from "@/assets/lose.wav";
 import win from "@/assets/win.wav";
-import tap from "@/assets/tap.wav";
+import tap from "@/assets/tap.mp3";
 
 export const AudioContext = createContext<{
   audioRef: React.RefObject<HTMLAudioElement> | null;

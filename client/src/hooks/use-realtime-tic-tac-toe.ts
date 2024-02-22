@@ -26,15 +26,11 @@ export const useRealtimeTicTacToe = ({
   const [reacting, setReacting] = useState<string>("");
   const [board, setBoard] = useState<string[]>(Array(9).fill(null));
   const [gameState, setGameState] = useState<GameState>(null);
-  const [allPlayersUsername, setAllPlayersUsername] = useState<string[]>([]);
   const { socket, isConnected } = useSocketContext();
 
   useEffect(() => {
     if (!isConnected || !socket) return;
 
-    const handleAllUsernameEvent = (usernames: string[]) => {
-      setAllPlayersUsername(usernames);
-    };
     const handleFoundMatchEvent = (playersObj: GameState) => {
       setGameState(playersObj);
       playEnter();
@@ -96,7 +92,6 @@ export const useRealtimeTicTacToe = ({
       resetGame();
     };
 
-    socket.on(SOCKET_EVENTS.ALL_USERNAMES, handleAllUsernameEvent);
     socket.on(SOCKET_EVENTS.FIND_MATCH, handleFoundMatchEvent);
     socket.on(SOCKET_EVENTS.PLAYING, handlePlayingEvent);
     socket.on(SOCKET_EVENTS.REACT, handleReactEvent);
@@ -106,7 +101,6 @@ export const useRealtimeTicTacToe = ({
 
     () => {
       socket.off(SOCKET_EVENTS.FIND_MATCH, handleFoundMatchEvent);
-      socket.off(SOCKET_EVENTS.ALL_USERNAMES, handleAllUsernameEvent);
       socket.off(SOCKET_EVENTS.PLAYING, handlePlayingEvent);
       socket.off(SOCKET_EVENTS.REACT, handleReactEvent);
       socket.off(SOCKET_EVENTS.PLAYER_LEFT, handlePlayerLeft);
@@ -117,12 +111,19 @@ export const useRealtimeTicTacToe = ({
 
   const findMatch = () => {
     if (!socket) return;
-    if (!username || allPlayersUsername.find((u) => u === username)) {
-      onOpen("Username Wrong");
+    if (!username || username.length < 3) {
+      onOpen("Username Wrong", {
+        error: "Username must be at least 3 characters long",
+      });
       return;
     }
     socket.emit(SOCKET_EVENTS.FIND_MATCH, { username });
     setFinding(true);
+  };
+
+  const joinInviteQueue = () => {
+    if (!socket || !username) return;
+    socket.emit(SOCKET_EVENTS.INVITE_JOIN, username);
   };
 
   const handlePlay = (index: number) => {
@@ -235,12 +236,12 @@ export const useRealtimeTicTacToe = ({
     handlePlay,
     board,
     gameState,
-    allPlayersUsername,
     isConnected,
     wonDrawLeftState,
     reacting,
     handleReact,
     askToPlayAgain,
+    joinInviteQueue
   };
 };
 

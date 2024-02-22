@@ -1,12 +1,19 @@
-import { useState } from "react";
 import { DetailsForm, GameBoard } from "@/components";
+import useJoinViaInvite from "@/hooks/use-join-via-invite";
 import useRealtimeTicTacToe from "@/hooks/use-realtime-tic-tac-toe";
+import { useState } from "react";
 
-const Home = () => {
+const JoinViaInvite = () => {
+  const [joining, setJoining] = useState(false);
+
   const [username, setUsername] = useState("");
-  const [finding, setFinding] = useState(false);
+  const { joinNow } = useJoinViaInvite({
+    joining,
+    setJoining,
+    username,
+    setUsername,
+  });
   const {
-    findMatch,
     handlePlay,
     board,
     gameState,
@@ -15,10 +22,9 @@ const Home = () => {
     reacting,
     askToPlayAgain,
     handleReact,
-    joinInviteQueue,
   } = useRealtimeTicTacToe({
     username,
-    setFinding,
+    setFinding: setJoining,
   });
 
   return (
@@ -39,15 +45,16 @@ const Home = () => {
         />
       ) : (
         <DetailsForm
-          joinInviteQueue={joinInviteQueue}
-          findMatch={findMatch}
-          loading={finding}
-          username={username}
+          findMatchButtonTitle="Join Game"
+          title="Welcome, Join Now!"
+          findMatch={joinNow}
+          loading={false}
           setUsername={setUsername}
+          username={username}
         />
       )}
     </main>
   );
 };
 
-export default Home;
+export default JoinViaInvite;

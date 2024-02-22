@@ -21,6 +21,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
+let inviteQueue: { username: string; socketId: string }[] = [];
 let queue: { username: string; socketId: string }[] = [];
 let playing: {
   p1: {
@@ -45,14 +46,6 @@ io.on("connection", (socket) => {
       username,
       socketId: socket.id,
     });
-
-    io.emit(SOCKET_EVENTS.ALL_USERNAMES, [
-      ...new Set([
-        ...queue.map((user) => user.username),
-        ...playing.map((game) => game.p1.username),
-        ...playing.map((game) => game.p2.username),
-      ]),
-    ]);
 
     if (queue.length > 1) {
       const player1 = queue.shift()!;
@@ -117,7 +110,72 @@ io.on("connection", (socket) => {
     io.to(to).emit(SOCKET_EVENTS.OK_PLAY_AGAIN);
   });
 
+  socket.on(SOCKET_EVENTS.INVITE_JOIN, (username: string) => {
+    if (inviteQueue.find((user) => user.username === username)) return;
+    inviteQueue.push({
+      username,
+      socketId: socket.id,
+    });
+  });
+
+  socket.on(
+    SOCKET_EVENTS.PLAY_VIA_INVITE,
+    ({
+      from,
+      to,
+    }: {
+      from: { socketId: string; username: string };
+      to: { socketId: string; username: string };
+    }) => {
+      // check if the one who invited is still in invite queue
+      const exists = inviteQueue.find(
+        (user) => user.socketId === from.socketId
+      );
+      const ifAleadyPlaying = playing.find(
+        (game) =>
+          game.p1.socketId === from.socketId ||
+          game.p2.socketId === from.socketId
+      );
+      if (!exists || ifAleadyPlaying) {
+        io.to(to.socketId).emit(SOCKET_EVENTS.INVITEE_LEFT);
+        return;
+      }
+      inviteQueue = inviteQueue.filter(
+        (user) => user.socketId !== from.socketId
+      );
+
+      const player1 = from;
+      const player2 = to;
+      const playersObj = {
+        p1: {
+          ...player1,
+          value: "X",
+        },
+        p2: {
+          ...player2,
+          value: "O",
+        },
+        turn: "X" as "X" | "O",
+      };
+      playing.push(playersObj);
+
+      /**
+       * KEEP NOTE: (Was stucked for 1/2 hour in figuring out why only the user to whom the current socket belongs recieving the event and other not 🥲)
+       * don't use socket to send message to particular id use io instead, since socket is specific to currently joined user
+       * Wrong ❌
+       * socket.to(player1.socketId).emit(SOCKET_EVENTS.FIND_MATCH, playersObj);
+       * socket.to(player2.socketId).emit(SOCKET_EVENTS.FIND_MATCH, playersObj);
+       *
+       * Correct ✅
+       */
+      io.to(player1.socketId).emit(SOCKET_EVENTS.FIND_MATCH, playersObj);
+      io.to(player2.socketId).emit(SOCKET_EVENTS.FIND_MATCH, playersObj);
+    }
+  );
+
   socket.on("disconnect", () => {
+    // Remove from invite queue if there
+    inviteQueue = inviteQueue.filter((user) => user.socketId !== socket.id);
     // Remove from queue if there
     queue = queue.filter((user) => user.socketId !== socket.id);
     // Remove from playing if there
@@ -142,13 +200,6 @@ io.on("connection", (socket) => {
         );
       }
     }
-    io.emit(SOCKET_EVENTS.ALL_USERNAMES, [
-      ...new Set([
-        ...queue.map((user) => user.username),
-        ...playing.map((game) => game.p1.username),
-        ...playing.map((game) => game.p2.username),
-      ]),
-    ]);
   });
 });
 

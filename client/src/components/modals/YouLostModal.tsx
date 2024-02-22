@@ -1,17 +1,17 @@
 import { useModal } from "@/hooks/use-modal-store";
-import GenericModal from "./GenericModal";
+import GenericModal from "../GenericModal";
 
-const YouWonModal = () => {
+const YouLostModal = () => {
   const { isOpen, onClose, type } = useModal();
-  const isModalOpen = isOpen && type === "You Won";
+  const isModalOpen = isOpen && type === "You Lost";
 
   return (
     <GenericModal
-      title="Congratulations 🎉! You won!"
+      title="Better luck next time 🥲!"
       onClose={onClose}
       isModalOpen={isModalOpen}
     />
   );
 };
 
-export default YouWonModal;
+export default YouLostModal;
