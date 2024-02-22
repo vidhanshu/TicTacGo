@@ -19,3 +19,5 @@ export const SERVER_URL =
 export const RANDOM_AVATAR_API = "https://robohash.org";
 
 export const EMOTES = ["😂", "🥲", "😶", "😎", "🤔"];
+
+export const INGAME_MSG_MAX_LENGTH = 45;

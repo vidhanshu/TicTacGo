@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { GameState } from "@/types";
 import { Button, Input } from "@/components";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EMOTES, RANDOM_AVATAR_API } from "@/utils";
+import { EMOTES, INGAME_MSG_MAX_LENGTH, RANDOM_AVATAR_API } from "@/utils";
 import { MdClose } from "react-icons/md";
 import { GoCircle } from "react-icons/go";
 import {
@@ -38,6 +38,15 @@ const GameBoardHeader = ({
   meWon: boolean;
 }) => {
   const [message, setMessage] = useState("");
+  const [meReacting, setMeReacting] = useState<string>("");
+  const handleMeReact = (val: string) => {
+    handleReact(val);
+    setMeReacting(val);
+    let id = setTimeout(() => {
+      setMeReacting("");
+      clearTimeout(id);
+    }, 5000);
+  };
   return (
     <>
       <div className="flex justify-between max-w-screen-lg mx-auto pb-6 px-4">
@@ -73,7 +82,7 @@ const GameBoardHeader = ({
           <div className="flex gap-x-4">
             {!wonDrawLeftState?.left ? (
               <>
-                <HoverCard openDelay={0}>
+                <HoverCard closeDelay={0} openDelay={0}>
                   <HoverCardTrigger asChild>
                     <button className="p-2 border-[2px] border-slate-700 rounded-full hover:bg-slate-700 group">
                       <BsEmojiSmile
@@ -84,13 +93,13 @@ const GameBoardHeader = ({
                   </HoverCardTrigger>
                   <HoverCardContent className="max-w-[200px] text-xl flex justify-between items-center">
                     {EMOTES.map((emote) => (
-                      <button key={emote} onClick={() => handleReact(emote)}>
+                      <button key={emote} onClick={() => handleMeReact(emote)}>
                         <span className="hover:translate-y-1">{emote}</span>
                       </button>
                     ))}
                   </HoverCardContent>
                 </HoverCard>
-                <HoverCard openDelay={0}>
+                <HoverCard closeDelay={0} openDelay={0}>
                   <HoverCardTrigger asChild>
                     <button className="p-2 border-[2px] border-slate-700 rounded-full hover:bg-slate-700 group">
                       <BsChat
@@ -105,7 +114,7 @@ const GameBoardHeader = ({
                         <button
                           className="hover:bg-slate-800 px-1 rounded-sm"
                           key={message}
-                          onClick={() => handleReact(message)}
+                          onClick={() => handleMeReact(message)}
                         >
                           {message}
                         </button>
@@ -114,15 +123,16 @@ const GameBoardHeader = ({
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
-                        if (!message || message.length > 20) return;
+                        if (!message || message.length > INGAME_MSG_MAX_LENGTH)
+                          return;
 
-                        handleReact(message);
+                        handleMeReact(message);
                         setMessage("");
                       }}
                       className="gap-x-2 hidden md:flex"
                     >
                       <Input
-                        maxLength={20}
+                        maxLength={INGAME_MSG_MAX_LENGTH}
                         placeholder="type & enter"
                         className="w-full"
                         value={message}
@@ -134,6 +144,23 @@ const GameBoardHeader = ({
               </>
             ) : null}
           </div>
+          {meReacting && (
+            <div className="p-1 bg-black absolute border border-slate-400 px-2 rounded-lg w-[180px] md:w-[200px] h-[60px] -top-[65px] inset-x-0 md:inset-auto md:top-0 md:-right-full">
+              <div
+                className={cn(
+                  EMOTES.includes(meReacting)
+                    ? "text-2xl text-center mt-2"
+                    : "text-sm"
+                )}
+              >
+                {meReacting}
+              </div>
+              <img
+                src="/chat-arrow-left.png"
+                className="hidden md:block w-14 absolute -bottom-[28px] left-0"
+              />
+            </div>
+          )}
         </div>
 
         {/* opponent */}
@@ -166,15 +193,20 @@ const GameBoardHeader = ({
             )}
           </h1>
           {reacting && (
-            <div
-              className={cn(
-                !EMOTES.includes(reacting)
-                  ? "text-blue-500 text-lg font-bold"
-                  : "text-4xl",
-                "absolute bottom-2 text-center w-full left-0 rounded-full animate-bounce"
-              )}
-            >
-              {reacting}
+            <div className="bg-black absolute border border-slate-400 px-2 rounded-lg w-[180px] md:w-[200px] h-[60px] -top-[65px] inset-x-0 md:inset-auto md:top-0 md:-left-full ">
+              <div
+                className={cn(
+                  EMOTES.includes(reacting)
+                    ? "text-2xl text-center mt-2"
+                    : "text-sm"
+                )}
+              >
+                {reacting}
+              </div>
+              <img
+                src="/chat-arrow-right.png"
+                className="hidden md:block w-14 absolute -bottom-[28px] right-0"
+              />
             </div>
           )}
           {wonDrawLeftState.left ? (

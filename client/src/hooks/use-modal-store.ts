@@ -9,7 +9,7 @@ export type ModalType =
   | "Play Again?"
   | "Copy Link"
   | "Invitee Left"
-  ;
+  | "Asked To Play Again";
 
 interface ModalData {
   username?: string;

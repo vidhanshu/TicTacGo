@@ -7,6 +7,7 @@ import PlayerLeftModal from "./modals/PlayerLeftModal";
 import PlayAgainModal from "./modals/PlayAgainModal";
 import CopyLinkModal from "./modals/CopyLinkModal";
 import InviteeLeftModal from "./modals/InviteeLeftModal";
+import AskedToPlayAgainModal from "./modals/AskedToPlayAgainModal";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -29,6 +30,7 @@ export const ModalProvider = () => {
       <PlayAgainModal />
       <CopyLinkModal/>
       <InviteeLeftModal/>
+      <AskedToPlayAgainModal/>
     </>
   );
 };

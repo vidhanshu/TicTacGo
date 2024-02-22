@@ -213,6 +213,7 @@ export const useRealtimeTicTacToe = ({
     socket.emit(SOCKET_EVENTS.PLAY_AGAIN, {
       to: opponent.socketId,
     });
+    onOpen("Asked To Play Again");
   };
 
   const resetGame = () => {
@@ -241,7 +242,7 @@ export const useRealtimeTicTacToe = ({
     reacting,
     handleReact,
     askToPlayAgain,
-    joinInviteQueue
+    joinInviteQueue,
   };
 };
 
