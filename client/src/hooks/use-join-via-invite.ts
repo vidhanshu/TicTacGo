@@ -5,9 +5,7 @@ import { SOCKET_EVENTS } from "@/utils";
 import { useEffect } from "react";
 
 export default function useJoinViaInvite({
-  joining,
   username,
-  setUsername,
   setJoining,
 }: {
   joining: boolean;
