@@ -10,7 +10,7 @@ const App = () => {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="join-via-invite" element={<JoinViaInvite/>}/>
+        <Route path="/join-via-invite" element={<JoinViaInvite/>}/>
       </Routes>
       <ModalProvider />
       <audio className="hidden" autoPlay={true} ref={audioRef} id="audio" />
