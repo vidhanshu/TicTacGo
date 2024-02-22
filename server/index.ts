@@ -21,7 +21,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-const queue: { username: string; socketId: string }[] = [];
+let queue: { username: string; socketId: string }[] = [];
 let playing: {
   p1: {
     value: string;
@@ -109,11 +109,18 @@ io.on("connection", (socket) => {
     }
   );
 
+  socket.on(SOCKET_EVENTS.PLAY_AGAIN, ({ to }: { to: string }) => {
+    io.to(to).emit(SOCKET_EVENTS.PLAY_AGAIN);
+  });
+
+  socket.on(SOCKET_EVENTS.OK_PLAY_AGAIN, ({ to }: { to: string }) => {
+    io.to(to).emit(SOCKET_EVENTS.OK_PLAY_AGAIN);
+  });
+
   socket.on("disconnect", () => {
-    const existsAleady = queue.find((user) => user.socketId === socket.id);
-    if (existsAleady) {
-      queue.splice(queue.indexOf(existsAleady), 1);
-    }
+    // Remove from queue if there
+    queue = queue.filter((user) => user.socketId !== socket.id);
+    // Remove from playing if there
     const existsInPlaying = playing.find(
       (player) =>
         player.p1.socketId === socket.id || player.p2.socketId === socket.id
@@ -124,9 +131,15 @@ io.on("connection", (socket) => {
           games.p1.socketId !== socket.id && games.p2.socketId !== socket.id
       );
       if (existsInPlaying.p1.socketId !== socket.id) {
-        socket.to(existsInPlaying.p1.socketId).emit(SOCKET_EVENTS.PLAYER_LEFT);
+        io.to(existsInPlaying.p1.socketId).emit(
+          SOCKET_EVENTS.PLAYER_LEFT,
+          existsInPlaying.p2.username
+        );
       } else {
-        socket.to(existsInPlaying.p2.socketId).emit(SOCKET_EVENTS.PLAYER_LEFT);
+        io.to(existsInPlaying.p2.socketId).emit(
+          SOCKET_EVENTS.PLAYER_LEFT,
+          existsInPlaying.p1.username
+        );
       }
     }
     io.emit(SOCKET_EVENTS.ALL_USERNAMES, [
